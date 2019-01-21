@@ -18,6 +18,11 @@ namespace Twitter
         [DataMember(Name = "new_latent_count", Order = 3)]
         public int NewLatentCount { get; set; }
 
+        public Response()
+        {
+
+        }
+
         public static Response ParseFromJson(String Json)
         {
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(Json));
