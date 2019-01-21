@@ -39,12 +39,12 @@ namespace Twitter_Followers_Scapper
             Speedometer speedometer = new Speedometer();
             speedometer.Start();
 
-            FollowersScraper scraper = new FollowersScraper(checker, config.Target, cookie);
+            FollowingScraper scraper = new FollowingScraper(checker, config.Target, cookie);
             Task.Run(async () =>
             {
                 try
                 {
-                    while (scraper.IsThereMoreItems)
+                   while (scraper.IsThereMoreItems)
                     {
                         User[] users = await scraper.NextAsync();
                         speedometer.Progress += users.Length;
@@ -61,6 +61,7 @@ namespace Twitter_Followers_Scapper
                     Console.WriteLine(e.ToString());
                 }
 
+                Console.WriteLine("Done!");
             });
 
             while (true)

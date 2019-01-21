@@ -8,11 +8,11 @@ using Neos07.Checking;
 
 namespace Twitter
 {
-    class FollowersScraper : Scraper<User>
+    class FollowingScraper : Scraper<User>
     {
         private static readonly Step initStep = new Step()
         {
-            Url = "https://twitter.com/%TARGET%/followers",
+            Url = "https://twitter.com/%TARGET%/following",
             Method = "GET",
             Headers = new Dictionary<string, string>()
             {
@@ -26,21 +26,21 @@ namespace Twitter
 
         private static readonly Step step = new Step()
         {
-            Url = "https://twitter.com/%TARGET%/followers/users?include_available_features=1&include_entities=1&max_position=%MAXPOSITION%&reset_error_state=false",
+            Url = "https://twitter.com/%TARGET%/following/users?include_available_features=1&include_entities=1&max_position=%MAXPOSITION%&reset_error_state=false",
             Method = "GET",
             Headers = new Dictionary<string, string>()
                 {
                     { "accept", "application/json, text/javascript, */*; q=0.01" },
                     { "accept-language", "en-US,en;q=0.9" },
                     { "cookie", "%COOKIE%" },
-                    { "referer", "https://twitter.com/%TARGET%/followers" },
+                    { "referer", "https://twitter.com/%TARGET%/following" },
                     { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0" },
                     { "x-requested-with", "XMLHttpRequest" },
                     { "x-twitter-active-user", "yes" }
                 }
         };
 
-        public FollowersScraper(Checker checker, string target, string cookie)
+        public FollowingScraper(Checker checker, string target, string cookie)
             : base(checker)
         {
             checker.Variables["TARGET"] = target;
