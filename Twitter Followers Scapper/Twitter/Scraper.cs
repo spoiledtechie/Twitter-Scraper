@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-using Neos07.Checking;
+using CheckingLib;
 
 namespace Twitter
 {

@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.13" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
+    <PackageReference Include="Speedometer" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CheckingLib">
+      <HintPath>..\..\CheckingLib\CheckingLib\bin\Release\netstandard2.0\CheckingLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

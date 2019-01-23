@@ -12,5 +12,15 @@
                     "Bio: " + Bio + "\n" +
                     "Handle: " + Handle;
         }
+
+        public static string GetCsvHeader()
+        {
+            return "Name,Bio,Handle";
+        }
+
+        public string ToCsv()
+        {
+            return $"{Name},{Bio},{Handle}";
+        }
     }
 }

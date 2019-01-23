@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 
 using HtmlAgilityPack;
-using Neos07.Checking;
+using CheckingLib;
 
 namespace Twitter
 {
@@ -66,7 +66,7 @@ namespace Twitter
                 users = new User[profileNodes.Count];
                 for (int i = 0; i < profileNodes.Count; i++)
                 {
-                    users[i] = GetTwitterUser(profileNodes[i]);
+                    users[i] = GetUser(profileNodes[i]);
                 }
                 string dataMinPosition = gridNode.GetAttributeValue("data-min-position", "");
 
@@ -96,7 +96,7 @@ namespace Twitter
                     users = new User[profileNodes.Count];
                     for (int i = 0; i < profileNodes.Count; i++)
                     {
-                        users[i] = GetTwitterUser(profileNodes[i]);
+                        users[i] = GetUser(profileNodes[i]);
                     }
                     Position = response.MinPosition;
                 }
@@ -109,7 +109,7 @@ namespace Twitter
         }
 
         // Get a Twitter.User object from a ProfileCard-userFields html element
-        private static User GetTwitterUser(HtmlNode htmlNode)
+        private static User GetUser(HtmlNode htmlNode)
         {
             User user = new User
             {
