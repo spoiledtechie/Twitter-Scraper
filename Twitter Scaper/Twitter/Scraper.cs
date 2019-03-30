@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-using CheckingLib;
+﻿using System.Threading.Tasks;
 
 namespace Twitter
 {
     abstract class Scraper<T>
     {
-        protected readonly Checker checker;
 
         public bool IsThereMoreItems { get; set; }
 
@@ -23,14 +17,14 @@ namespace Twitter
             set
             {
                 position = value;
-                checker.Variables["MAXPOSITION"] = position;
+                //checker.Variables["MAXPOSITION"] = position;
                 IsThereMoreItems = true;
             }
         }
 
-        public Scraper(Checker checker)
+        public Scraper(/*Checker checker*/)
         {
-            this.checker = checker;
+            //this.checker = checker;
             position = null;
             IsThereMoreItems = true;
         }

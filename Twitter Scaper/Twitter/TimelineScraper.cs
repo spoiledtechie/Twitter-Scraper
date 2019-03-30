@@ -1,62 +1,64 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-
-using HtmlAgilityPack;
-using CheckingLib;
 
 namespace Twitter
 {
-    class TweetsScraper : Scraper<Tweet>
+    class TimelineScraper : Scraper<Tweet>
     {
         private static int counter = 0;
+        private readonly HttpClientHandler _httpClientHandler;
+        private readonly HttpClient _httpClient;
+        string _target;
 
-        private static readonly Step initStep = new Step()
+        //private static readonly Step step = new Step()
+        //{
+        //};
+
+        public TimelineScraper(string target)
         {
-            Url = "https://twitter.com/%TARGET%",
-            Method = "GET",
-            Headers = new Dictionary<string, string>()
+
+            _httpClientHandler = new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.GZip,
+                UseCookies = true,
+            };
+            _httpClient = new HttpClient(_httpClientHandler, disposeHandler: false);
+            _target = target;
+        }
+
+        public override async Task<Tweet[]> NextAsync()
+        {
+
+            Tweet[] tweets = null;
+
+            // If it's the first request
+            HtmlDocument htmlDocument = null;
+            if (Position == null)
+            {
+                string url = "https://twitter.com/" + _target;
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                var Headers = new Dictionary<string, string>()
             {
                 { "accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" },
                 { "accept-language", "en-US,en;q=0.9" },
                 { "referer" , "https://twitter.com/" },
                 { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0" },
-            }
-        };
-
-        private static readonly Step step = new Step()
-        {
-            Url = "https://twitter.com/i/profiles/show/%TARGET%/timeline/tweets?include_available_features=1&include_entities=1&lang=en&max_position=%MAXPOSITION%&reset_error_state=false",
-            Method = "GET",
-            Headers = new Dictionary<string, string>()
+            };
+                foreach (var item in Headers)
                 {
-                    { "accept", "application/json, text/javascript, */*; q=0.01" },
-                    { "accept-language", "en-US,en;q=0.9" },
-                    { "referer", "https://twitter.com/%TARGET%" },
-                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0" },
-                    { "x-requested-with", "XMLHttpRequest" },
-                    { "x-twitter-active-user", "yes" }
+                    request.Headers.Add(item.Key, item.Value);
                 }
-        };
 
-        public TweetsScraper(Checker checker, string target)
-            : base(checker)
-        {
-            checker.Variables["TARGET"] = target;
-        }
+                Console.WriteLine(url);
 
-        public override async Task<Tweet[]> NextAsync()
-        {
-            if (!IsThereMoreItems)
-                throw new NoMoreItemsExceptions("There is no more users to scrape.");
+                var response = await _httpClient.SendAsync(request);
 
-            Tweet[] tweets = null;
-
-            // If it's the first request
-            HtmlDocument htmlDocument;
-            if (Position == null)
-            {
-                string result = await checker.ExecuteAsync(initStep);
+                var result = await response.Content.ReadAsStringAsync();
                 counter++;
                 htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(result);
@@ -67,7 +69,32 @@ namespace Twitter
             }
             else
             {
-                string result = await checker.ExecuteAsync(step);
+                string url = "https://twitter.com/i/profiles/show/" + _target + "/timeline/tweets?include_available_features=1&include_entities=1&lang=en&max_position=" + Position + "&reset_error_state=false";
+                var Headers = new Dictionary<string, string>()
+                        {
+                            { "accept", "application/json, text/javascript, */*; q=0.01" },
+                            { "accept-language", "en-US,en;q=0.9" },
+                            { "referer", "https://twitter.com/" +_target },
+                            { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0" },
+                            { "x-requested-with", "XMLHttpRequest" },
+                            { "x-twitter-active-user", "yes" }
+                        };
+
+                Console.WriteLine(url);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                foreach (var item in Headers)
+                {
+                    request.Headers.Add(item.Key, item.Value);
+                }
+
+                Console.WriteLine(url);
+
+                var response = await _httpClient.SendAsync(request);
+
+                string result = await response.Content.ReadAsStringAsync();
+
                 counter++;
                 if (result.Contains("Sorry, you are rate limited."))
                 {
@@ -75,11 +102,11 @@ namespace Twitter
                 }
                 else
                 {
-                    Response response = Response.ParseFromJson(result);
-                    IsThereMoreItems = response.HasMoreItems;
+                    Response responses = Response.ParseFromJson(result);
+                    IsThereMoreItems = responses.HasMoreItems;
                     htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(response.ItemsHtml);
-                    Position = response.MinPosition;
+                    htmlDocument.LoadHtml(responses.ItemsHtml);
+                    Position = responses.MinPosition;
                 }
             }
 
@@ -100,6 +127,7 @@ namespace Twitter
                 if (Position == "0")
                     IsThereMoreItems = false;
             }
+
 
 
             return tweets;

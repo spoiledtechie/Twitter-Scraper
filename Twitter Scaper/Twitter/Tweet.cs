@@ -25,6 +25,8 @@ namespace Twitter
         public int Retweets { get; set; }
         [DataMember(Order = 6)]
         public int Replies { get; set; }
+        [DataMember(Order = 7)]
+        public string Id { get;  set; }
 
         public static Response ParseFromJson(String Json)
         {
@@ -50,12 +52,12 @@ namespace Twitter
 
         public static string GetCsvHeader()
         {
-            return "Name,Handle,Time,Text,Likes,Retweets,Replies";
+            return "Id,Name,Handle,Time,Text,Likes,Retweets,Replies";
         }
 
         public string ToCsv()
         {
-            return $"{Name},{Handle},{Time},{Text},{Likes},{Retweets},{Replies}";
+            return $"{Id},{Name},{Handle},{Time},{Text},{Likes},{Retweets},{Replies}";
         }
     }
 }

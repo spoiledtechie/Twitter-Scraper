@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 
 using Twitter;
-using CheckingLib;
 
 namespace Twitter_Followers_Scapper
 {
@@ -11,14 +10,14 @@ namespace Twitter_Followers_Scapper
     {
         // 5400 followers per hour or 300 requests* 18 followers per hour
         private static Config config;
-       private static readonly string cookie = "";
+        private static readonly string cookie = "";
 
         static void Main(string[] args)
         {
-            Checker checker = new Checker();
             Speedometer.Speedometer speedometer = new Speedometer.Speedometer();
             speedometer.Start();
-            TweetsScraper scraper = new TweetsScraper(checker, "realDonaldTrump");
+            //TimelineScraper scraper = new TimelineScraper("realDonaldTrump");
+            SearchScraper scraper = new SearchScraper("realDonaldTrump", new DateTime(2009, 04, 01), new DateTime(2009, 10, 01));
             Task.Run(async () =>
             {
                 try
@@ -29,6 +28,8 @@ namespace Twitter_Followers_Scapper
                         Tweet[] tweets = await scraper.NextAsync();
                         speedometer.Progress += tweets.Length;
                         Console.Title = $"Scraping tweets from @realDonaldTrump | Progress: {speedometer.Progress} tweets | Speed: {speedometer.GetProgressPerHour()} tweets/hour";
+
+                        Console.WriteLine(speedometer.Progress);
 
                         foreach (Tweet tweet in tweets)
                         {
